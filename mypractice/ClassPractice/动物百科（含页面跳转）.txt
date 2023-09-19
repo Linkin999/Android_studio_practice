@@ -1,0 +1,249 @@
+Activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:context=".MainActivity"
+    android:orientation="vertical">
+    <TextView
+        android:id="@+id/tv_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="动物百科"
+        android:gravity="center"
+        android:layout_marginTop="10dp"
+        android:textColor="#0FEDE6"
+        android:textSize="30sp"
+        android:background="#1D8036"
+        android:padding="10dp"/>
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/rv"
+        android:background="#CD1121"/>
+
+
+</LinearLayout>
+
+item_layout.xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+    <ImageView
+        android:id="@+id/iv_image"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:scaleType="fitXY"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <TextView
+            android:id="@+id/tv_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="动物名"
+            android:textSize="25sp"
+            android:textColor="#8E0858"
+            android:padding="10dp"
+            android:background="@color/white"/>
+        <TextView
+            android:id="@+id/tv_information"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="动物介绍"
+            android:paddingLeft="10dp"
+            android:ellipsize="end"
+            android:background="@color/white"/>
+
+    </LinearLayout>
+
+
+</LinearLayout>
+
+MainActivity.java
+package com.example.myapplication;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import android.animation.ObjectAnimator;
+import android.content.ComponentName;
+import android.content.Intent;
+import android.content.ServiceConnection;
+import android.graphics.Rect;
+import android.media.MediaPlayer;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.IBinder;
+import android.os.Looper;
+import android.os.Message;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.animation.LinearInterpolator;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.SeekBar;
+import android.widget.TextView;
+
+import java.util.Timer;
+
+public class MainActivity extends AppCompatActivity{
+    private RecyclerView mrv;
+
+    private int[] images = {R.drawable.dog,R.drawable.bird,R.drawable.cat};
+    private String[] names={"dog","bird","cat"};
+    private int[] infos ={R.string.dog,R.string.bird,R.string.cat};
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        mrv=findViewById(R.id.rv);
+        mrv.setLayoutManager(new LinearLayoutManager(MainActivity.this,LinearLayoutManager.VERTICAL,false));
+        mrv.setAdapter(new MyAdapter());
+        mrv.addItemDecoration(new MyDecoration());
+    }
+
+    private class MyAdapter extends RecyclerView.Adapter<MyHolder> {
+        @NonNull
+        @Override
+        //
+        public MyHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            View itemView = View.inflate(getApplicationContext(),R.layout.item_layout,null);
+            MyHolder myHolder = new MyHolder(itemView);
+            return myHolder;
+        }
+
+        @Override
+        //给每个item赋值具体的内容
+        public void onBindViewHolder(@NonNull MyHolder holder, int position) {
+            holder.miv_image.setBackgroundResource(images[position]);
+            holder.mtv_name.setText(names[position]);
+            holder.mtv_information.setText(infos[position]);
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = null;
+                    switch (position){
+                        case 0:{
+                            intent = new Intent(MainActivity.this,DogActivity.class);
+                            break;
+                        }
+                        case 1:{
+                            intent = new Intent(MainActivity.this,CatActivity.class);
+                            break;
+                        }
+
+                    }
+                    startActivity(intent);
+                }
+            });
+        }
+
+        @Override
+        //返回item数量
+        public int getItemCount() {
+            return images.length;
+        }
+    }
+
+    //告诉自定义的MyHolder对象里面有哪些控件，并与转成的视图文件里面的控件对应
+    private class MyHolder extends RecyclerView.ViewHolder {
+        private ImageView miv_image;
+        private TextView mtv_name,mtv_information;
+        public MyHolder(@NonNull View itemView) {
+            super(itemView);
+            miv_image = itemView.findViewById(R.id.iv_image);
+            mtv_name = itemView.findViewById(R.id.tv_name);
+            mtv_information = itemView.findViewById(R.id.tv_information);
+
+        }
+    }
+
+    //定义一个ItemDecoration.
+    private class MyDecoration extends RecyclerView.ItemDecoration {
+        @Override
+        public void getItemOffsets(@NonNull Rect outRect, @NonNull View view, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
+            super.getItemOffsets(outRect, view, parent, state);
+            outRect.set(10,0,10,20);
+        }
+    }
+}
+
+Activity_cat.xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".CatActivity"
+    android:background="@drawable/face">
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="40sp"
+        android:text="猫的种类有。。。"
+        android:padding="20dp"/>
+
+</LinearLayout>
+
+CatActivity.java
+package com.example.myapplication;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.os.Bundle;
+
+public class CatActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_cat);
+    }
+}
+
+Activity_dog.xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".DogActivity"
+    android:background="@color/cardview_dark_background">
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="40sp"
+        android:text="狗的种类有。。。"
+        android:padding="20dp"/>
+
+</LinearLayout>
+
+DogActivity.java
+package com.example.myapplication;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.os.Bundle;
+
+public class DogActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_dog);
+    }
+}
+

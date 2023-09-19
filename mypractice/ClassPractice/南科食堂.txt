@@ -1,0 +1,224 @@
+activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity"
+    android:orientation="vertical">
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="南科烧烤"
+        android:gravity="center"
+        android:textColor="#DF6411"
+        android:textSize="30sp"
+        android:background="#0D3A6A"
+        android:padding="5dp"/>
+    <LinearLayout
+        android:id="@+id/ll_menu"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical">
+            <Button
+                android:id="@+id/btnzhushi"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:text="主食"
+                android:textSize="25sp"
+                android:textColor="#104798"
+                android:background="#F3A26C"
+                android:layout_weight="1"/>
+            <Button
+                android:id="@+id/btnchaocai"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:text="炒菜"
+                android:textSize="25sp"
+                android:textColor="#104798"
+                android:background="#F3A26C"
+                android:layout_weight="1"/>
+            <Button
+                android:id="@+id/btnmalat"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:text="麻辣烫"
+                android:textSize="25sp"
+                android:textColor="#104798"
+                android:background="#F3A26C"
+                android:layout_weight="1"/>
+            <Button
+                android:id="@+id/btnqingzhencai"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:text="清真菜"
+                android:textSize="25sp"
+                android:textColor="#104798"
+                android:background="#F3A26C"
+                android:layout_weight="1"/>
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/ll_detail"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:orientation="horizontal">
+        </LinearLayout>
+    </LinearLayout>
+
+
+</LinearLayout>
+
+fragment_main_food.xml
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainFoodFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="主食有" />
+
+</FrameLayout>
+
+fragment_chao_cai.xml
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainFoodFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="炒菜有" />
+
+</FrameLayout>
+
+MainActivity.java
+package com.example.myapplication;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import android.animation.ObjectAnimator;
+import android.content.ComponentName;
+import android.content.Intent;
+import android.content.ServiceConnection;
+import android.graphics.Rect;
+import android.media.MediaPlayer;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.IBinder;
+import android.os.Looper;
+import android.os.Message;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.animation.LinearInterpolator;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.SeekBar;
+import android.widget.TextView;
+
+import java.util.Timer;
+
+public class MainActivity extends AppCompatActivity{
+    private MainFoodFragment mainFoodFragment = new MainFoodFragment();
+    private ChaoCaiFragment chaoCaiFragment = new ChaoCaiFragment();
+    private Button btn_zhushi,btn_chaocai,btn_mlt,btn_qzc;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        getSupportFragmentManager().beginTransaction().add(R.id.ll_detail,mainFoodFragment).commitAllowingStateLoss();
+        getSupportFragmentManager().beginTransaction().add(R.id.ll_detail,chaoCaiFragment).commitAllowingStateLoss();
+
+
+        btn_zhushi=findViewById(R.id.btnzhushi);
+        btn_chaocai=findViewById(R.id.btnchaocai);
+        btn_mlt=findViewById(R.id.btnmalat);
+        btn_qzc=findViewById(R.id.btnqingzhencai);
+
+        OnClick onClick = new OnClick();
+        btn_zhushi.setOnClickListener(onClick);
+        btn_chaocai.setOnClickListener(onClick);
+        btn_mlt.setOnClickListener(onClick);
+        btn_qzc.setOnClickListener(onClick);
+    }
+
+
+    private class OnClick implements View.OnClickListener{
+        @Override
+        public void onClick(View view) {
+            switch (view.getId()){
+                case R.id.btnzhushi:
+                    //将布局aFragment添加到 R.id.ll_detail 中。
+                    getSupportFragmentManager().beginTransaction().replace(R.id.ll_detail,mainFoodFragment).commitAllowingStateLoss();
+                    break;
+                case R.id.btnchaocai:
+                    //将布局aFragment添加到 R.id.ll_detail 中。
+                    getSupportFragmentManager().beginTransaction().replace(R.id.ll_detail,chaoCaiFragment).commitAllowingStateLoss();
+                    break;
+            }
+        }
+    }
+}
+
+MainFoodFragment.java
+package com.example.myapplication;
+
+import android.os.Bundle;
+
+import androidx.fragment.app.Fragment;
+
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
+
+public class MainFoodFragment extends Fragment {
+
+
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.fragment_main_food, container, false);
+    }
+}
+
+ChaoCaiFragment.java
+package com.example.myapplication;
+
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
+import androidx.fragment.app.Fragment;
+
+public class ChaoCaiFragment extends Fragment {
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.fragment_chao_cai, container, false);
+    }
+}
